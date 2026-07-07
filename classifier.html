@@ -28,47 +28,36 @@
     .header { text-align: center; margin-bottom: 24px; }
     .header h1 { font-size: 24px; font-weight: 700; margin-bottom: 8px; }
     .header p { color: #666; font-size: 14px; line-height: 1.5; }
-    .tabs { display: flex; gap: 8px; margin-bottom: 20px; }
-    .tab {
-      flex: 1; padding: 10px; border: 1.5px solid #e0e0e6; background: #f7f7fb;
-      border-radius: 8px; font-size: 14px; font-weight: 600; cursor: pointer;
-      color: #666; transition: all 0.2s;
-    }
-    .tab.active { background: #667eea; color: #fff; border-color: #667eea; }
-    button.action {
-      width: 100%; padding: 14px;
-      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-      color: #fff; border: none; border-radius: 8px;
-      font-size: 16px; font-weight: 700; cursor: pointer; transition: opacity 0.2s;
-    }
-    button.action:hover { opacity: 0.92; }
-    button.action:disabled { opacity: 0.6; cursor: not-allowed; }
-    .stage {
-      margin-top: 20px; min-height: 60px; display: flex;
-      flex-direction: column; align-items: center; gap: 16px;
-    }
-    #webcam-container canvas, #preview {
-      border-radius: 12px; max-width: 100%; box-shadow: 0 6px 20px rgba(0,0,0,0.15);
-    }
-    #preview { display: none; max-height: 260px; }
     .drop {
-      width: 100%; border: 2px dashed #c3c3d6; border-radius: 12px;
-      padding: 28px; text-align: center; color: #888; font-size: 14px;
+      display: block; width: 100%; border: 2px dashed #c3c3d6; border-radius: 12px;
+      padding: 40px 20px; text-align: center; color: #888; font-size: 14px;
       cursor: pointer; transition: border-color 0.2s, background 0.2s;
     }
     .drop:hover { border-color: #667eea; background: #f7f7fb; }
-    .labels { width: 100%; margin-top: 8px; display: flex; flex-direction: column; gap: 10px; }
-    .row { }
+    .drop .icon { font-size: 40px; display: block; margin-bottom: 10px; }
+    .drop strong { color: #667eea; }
+    .stage { margin-top: 20px; display: flex; flex-direction: column; align-items: center; }
+    #preview {
+      display: none; max-width: 100%; max-height: 300px;
+      border-radius: 12px; box-shadow: 0 6px 20px rgba(0,0,0,0.15);
+    }
+    .labels { width: 100%; margin-top: 20px; display: flex; flex-direction: column; gap: 12px; }
     .row .top { display: flex; justify-content: space-between; font-size: 14px; font-weight: 600; margin-bottom: 4px; }
     .row .pct { color: #667eea; }
-    .bar { height: 12px; background: #eee; border-radius: 6px; overflow: hidden; }
+    .bar { height: 14px; background: #eee; border-radius: 7px; overflow: hidden; }
     .bar > span {
       display: block; height: 100%; width: 0%;
       background: linear-gradient(90deg, #667eea, #764ba2); transition: width 0.25s ease;
     }
     .row.winner .top { color: #764ba2; }
     .row.winner .name::before { content: "🏆 "; }
-    .status { text-align: center; font-size: 13px; color: #999; margin-top: 12px; min-height: 18px; }
+    .again {
+      display: none; width: 100%; margin-top: 20px; padding: 12px;
+      background: #f0f0f7; color: #555; border: none; border-radius: 8px;
+      font-size: 14px; font-weight: 600; cursor: pointer;
+    }
+    .again:hover { background: #e6e6f2; }
+    .status { text-align: center; font-size: 13px; color: #999; margin-top: 16px; min-height: 18px; }
     .status.err { color: #e74c3c; }
     .back { margin-top: 22px; text-align: center; }
     .back a { color: #fff; font-size: 13px; opacity: 0.85; text-decoration: none; }
@@ -79,34 +68,22 @@
   <div class="card">
     <div class="header">
       <h1>사물 구분 · 병 vs 캔</h1>
-      <p>웹캠 또는 이미지로 물체를 인식합니다.<br>Teachable Machine 이미지 모델 기반.</p>
+      <p>사진을 올리면 물체를 인식합니다.<br>Teachable Machine 이미지 모델 기반.</p>
     </div>
 
-    <div class="tabs">
-      <button class="tab active" id="tab-webcam" onclick="switchMode('webcam')">📷 웹캠</button>
-      <button class="tab" id="tab-image" onclick="switchMode('image')">🖼️ 이미지 업로드</button>
-    </div>
+    <label class="drop" for="file-input" id="drop-zone">
+      <span class="icon">📷</span>
+      <span id="drop-text"><strong>클릭해서 사진 선택</strong><br>또는 이미지를 여기로 끌어다 놓으세요</span>
+    </label>
+    <input type="file" id="file-input" accept="image/*" style="display:none;">
 
-    <!-- 웹캠 모드 -->
-    <div id="mode-webcam">
-      <button class="action" id="start-btn" onclick="initWebcam()">웹캠 시작</button>
-      <div class="stage">
-        <div id="webcam-container"></div>
-      </div>
-    </div>
-
-    <!-- 이미지 모드 -->
-    <div id="mode-image" style="display:none;">
-      <label class="drop" for="file-input" id="drop-zone">
-        여기를 클릭하거나 이미지를 끌어다 놓으세요
-      </label>
-      <input type="file" id="file-input" accept="image/*" style="display:none;">
-      <div class="stage">
-        <img id="preview" alt="업로드 미리보기">
-      </div>
+    <div class="stage">
+      <img id="preview" alt="업로드 미리보기">
     </div>
 
     <div class="labels" id="label-container"></div>
+
+    <button class="again" id="again-btn" onclick="resetPicker()">다른 사진 올리기</button>
     <div class="status" id="status">모델 로딩 대기 중...</div>
   </div>
 
@@ -125,10 +102,14 @@
     // 예: { "Class 1": "병", "Class 2": "캔" }
     // ▲▲▲ 어느 클래스가 병/캔인지 확인 후 위 값을 바꾸면 화면에 한글로 표시됩니다 ▲▲▲
 
-    let model, webcam, maxPredictions, rafId;
-    let modelReady = false;
+    let model, maxPredictions, modelReady = false;
     const statusEl = document.getElementById('status');
     const labelContainer = document.getElementById('label-container');
+    const fileInput = document.getElementById('file-input');
+    const preview = document.getElementById('preview');
+    const dropZone = document.getElementById('drop-zone');
+    const dropText = document.getElementById('drop-text');
+    const againBtn = document.getElementById('again-btn');
 
     function setStatus(msg, isErr) {
       statusEl.textContent = msg;
@@ -144,7 +125,7 @@
         maxPredictions = model.getTotalClasses();
         buildLabelRows();
         modelReady = true;
-        setStatus('모델 준비 완료 ✅');
+        setStatus('사진을 올려주세요');
       } catch (e) {
         setStatus('모델 로딩 실패: ' + e.message, true);
         throw e;
@@ -153,8 +134,7 @@
 
     function buildLabelRows() {
       labelContainer.innerHTML = '';
-      const classes = model.getClassLabels();
-      classes.forEach(raw => {
+      model.getClassLabels().forEach(raw => {
         const row = document.createElement('div');
         row.className = 'row';
         row.dataset.raw = raw;
@@ -180,52 +160,13 @@
       });
     }
 
-    // ===== 웹캠 모드 =====
-    async function initWebcam() {
-      const btn = document.getElementById('start-btn');
-      btn.disabled = true;
-      try {
-        await loadModel();
-        const flip = true;
-        webcam = new tmImage.Webcam(240, 240, flip);
-        await webcam.setup();
-        await webcam.play();
-        document.getElementById('webcam-container').innerHTML = '';
-        document.getElementById('webcam-container').appendChild(webcam.canvas);
-        btn.style.display = 'none';
-        setStatus('실시간 인식 중...');
-        loop();
-      } catch (e) {
-        btn.disabled = false;
-        setStatus('웹캠을 시작할 수 없습니다: ' + e.message, true);
-      }
-    }
-    async function loop() {
-      webcam.update();
-      const preds = await model.predict(webcam.canvas);
-      renderPredictions(preds);
-      rafId = window.requestAnimationFrame(loop);
-    }
-    function stopWebcam() {
-      if (rafId) cancelAnimationFrame(rafId);
-      if (webcam) { try { webcam.stop(); } catch (e) {} webcam = null; }
-      const c = document.getElementById('webcam-container');
-      if (c) c.innerHTML = '';
-      const btn = document.getElementById('start-btn');
-      btn.style.display = ''; btn.disabled = false;
-    }
-
-    // ===== 이미지 업로드 모드 =====
-    const fileInput = document.getElementById('file-input');
-    const preview = document.getElementById('preview');
-    const dropZone = document.getElementById('drop-zone');
-
+    // ===== 이미지 업로드 =====
     fileInput.addEventListener('change', e => { if (e.target.files[0]) handleFile(e.target.files[0]); });
     ['dragover','dragenter'].forEach(ev => dropZone.addEventListener(ev, e => {
-      e.preventDefault(); dropZone.style.borderColor = '#667eea';
+      e.preventDefault(); dropZone.style.borderColor = '#667eea'; dropZone.style.background = '#f7f7fb';
     }));
     ['dragleave','drop'].forEach(ev => dropZone.addEventListener(ev, e => {
-      e.preventDefault(); dropZone.style.borderColor = '';
+      e.preventDefault(); dropZone.style.borderColor = ''; dropZone.style.background = '';
     }));
     dropZone.addEventListener('drop', e => {
       if (e.dataTransfer.files[0]) handleFile(e.dataTransfer.files[0]);
@@ -233,32 +174,30 @@
 
     async function handleFile(file) {
       if (!file.type.startsWith('image/')) { setStatus('이미지 파일만 가능합니다.', true); return; }
-      try {
-        await loadModel();
-      } catch (e) { return; }
+      try { await loadModel(); } catch (e) { return; }
       const url = URL.createObjectURL(file);
       preview.onload = async () => {
         preview.style.display = 'block';
+        dropZone.style.display = 'none';
         setStatus('분석 중...');
         const preds = await model.predict(preview);
         renderPredictions(preds);
         const best = preds.reduce((a, b) => a.probability > b.probability ? a : b);
         setStatus('결과: ' + displayName(best.className) + ' (' + Math.round(best.probability*100) + '%)');
+        againBtn.style.display = 'block';
         URL.revokeObjectURL(url);
       };
       preview.src = url;
     }
 
-    // ===== 모드 전환 =====
-    function switchMode(mode) {
-      const isCam = mode === 'webcam';
-      document.getElementById('tab-webcam').classList.toggle('active', isCam);
-      document.getElementById('tab-image').classList.toggle('active', !isCam);
-      document.getElementById('mode-webcam').style.display = isCam ? '' : 'none';
-      document.getElementById('mode-image').style.display = isCam ? 'none' : '';
-      if (isCam) { preview.style.display = 'none'; }
-      else { stopWebcam(); }
-      if (modelReady) setStatus(isCam ? '웹캠 시작을 눌러주세요' : '이미지를 올려주세요');
+    function resetPicker() {
+      preview.style.display = 'none';
+      preview.src = '';
+      dropZone.style.display = 'block';
+      againBtn.style.display = 'none';
+      fileInput.value = '';
+      renderPredictions(model.getClassLabels().map(c => ({ className: c, probability: 0 })));
+      setStatus('사진을 올려주세요');
     }
 
     // 페이지 로드 시 모델 미리 로딩
