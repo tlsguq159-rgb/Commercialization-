@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>제휴 문의</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Malgun Gothic", sans-serif;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+      color: #1a1a2e;
+    }
+    .card {
+      background: #fff;
+      width: 100%;
+      max-width: 520px;
+      border-radius: 16px;
+      box-shadow: 0 20px 60px rgba(0,0,0,0.25);
+      padding: 40px 36px;
+    }
+    .header { text-align: center; margin-bottom: 28px; }
+    .header h1 { font-size: 26px; font-weight: 700; margin-bottom: 8px; }
+    .header p { color: #666; font-size: 14px; line-height: 1.5; }
+    .field { margin-bottom: 18px; }
+    label { display: block; font-size: 14px; font-weight: 600; margin-bottom: 6px; }
+    label .req { color: #e74c3c; }
+    input, textarea, select {
+      width: 100%;
+      padding: 12px 14px;
+      border: 1.5px solid #e0e0e6;
+      border-radius: 8px;
+      font-size: 15px;
+      font-family: inherit;
+      transition: border-color 0.2s;
+    }
+    input:focus, textarea:focus, select:focus {
+      outline: none;
+      border-color: #667eea;
+    }
+    textarea { resize: vertical; min-height: 110px; }
+    button {
+      width: 100%;
+      padding: 14px;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: #fff;
+      border: none;
+      border-radius: 8px;
+      font-size: 16px;
+      font-weight: 700;
+      cursor: pointer;
+      margin-top: 8px;
+      transition: opacity 0.2s, transform 0.1s;
+    }
+    button:hover { opacity: 0.92; }
+    button:active { transform: translateY(1px); }
+    button:disabled { opacity: 0.6; cursor: not-allowed; }
+    .status {
+      text-align: center;
+      margin-top: 16px;
+      font-size: 14px;
+      font-weight: 600;
+      display: none;
+    }
+    .status.success { display: block; color: #27ae60; }
+    .status.error { display: block; color: #e74c3c; }
+    .footer { text-align: center; margin-top: 24px; font-size: 12px; color: #aaa; }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <div class="header">
+      <h1>제휴 문의</h1>
+      <p>제휴·협업 제안을 남겨주시면 담당자가 확인 후 회신드립니다.</p>
+    </div>
+
+    <form id="inquiry-form" action="https://formspree.io/f/xjgqzqyq" method="POST">
+      <div class="field">
+        <label for="name">이름 / 담당자 <span class="req">*</span></label>
+        <input type="text" id="name" name="name" required placeholder="홍길동">
+      </div>
+
+      <div class="field">
+        <label for="company">회사 / 소속</label>
+        <input type="text" id="company" name="company" placeholder="(주)예시">
+      </div>
+
+      <div class="field">
+        <label for="email">이메일 <span class="req">*</span></label>
+        <input type="email" id="email" name="email" required placeholder="you@example.com">
+      </div>
+
+      <div class="field">
+        <label for="phone">연락처</label>
+        <input type="tel" id="phone" name="phone" placeholder="010-0000-0000">
+      </div>
+
+      <div class="field">
+        <label for="type">문의 유형</label>
+        <select id="type" name="type">
+          <option value="사업 제휴">사업 제휴</option>
+          <option value="기술 협업">기술 협업</option>
+          <option value="투자 문의">투자 문의</option>
+          <option value="기타">기타</option>
+        </select>
+      </div>
+
+      <div class="field">
+        <label for="message">문의 내용 <span class="req">*</span></label>
+        <textarea id="message" name="message" required placeholder="제휴 제안 내용을 자유롭게 작성해주세요."></textarea>
+      </div>
+
+      <input type="hidden" name="_subject" value="[제휴 문의] 새 문의가 도착했습니다">
+
+      <button type="submit" id="submit-btn">문의 보내기</button>
+      <div class="status" id="status"></div>
+    </form>
+
+    <div class="footer">Powered by Formspree</div>
+  </div>
+
+  <script>
+    const form = document.getElementById('inquiry-form');
+    const status = document.getElementById('status');
+    const btn = document.getElementById('submit-btn');
+
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      btn.disabled = true;
+      btn.textContent = '보내는 중...';
+      status.className = 'status';
+
+      try {
+        const res = await fetch(form.action, {
+          method: 'POST',
+          body: new FormData(form),
+          headers: { 'Accept': 'application/json' }
+        });
+
+        if (res.ok) {
+          status.textContent = '✅ 문의가 정상적으로 접수되었습니다. 감사합니다!';
+          status.className = 'status success';
+          form.reset();
+        } else {
+          const data = await res.json().catch(() => ({}));
+          const msg = data.errors ? data.errors.map(x => x.message).join(', ') : '전송에 실패했습니다.';
+          status.textContent = '⚠️ ' + msg;
+          status.className = 'status error';
+        }
+      } catch (err) {
+        status.textContent = '⚠️ 네트워크 오류가 발생했습니다. 잠시 후 다시 시도해주세요.';
+        status.className = 'status error';
+      } finally {
+        btn.disabled = false;
+        btn.textContent = '문의 보내기';
+      }
+    });
+  </script>
+</body>
+</html>
